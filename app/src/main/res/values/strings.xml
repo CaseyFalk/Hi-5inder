@@ -5,4 +5,7 @@
     <string name="title_activity_search">Search</string>
     <string name="todo">TODO</string>
     <string name="enter_status">Enter Status</string>
+    <string name="username2">Username</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="start_searching">Start Searching</string>
 </resources>

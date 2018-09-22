@@ -145,7 +145,7 @@ public class Search extends AppCompatActivity implements LocationListener {
             }
         });
 
-        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 16.0934);
+        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.60934);
 
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override

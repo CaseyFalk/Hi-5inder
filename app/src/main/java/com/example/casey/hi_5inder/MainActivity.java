@@ -40,17 +40,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //opening profile activity
             startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
         }
-        //initializing views
+/*        //initializing views
         editTextEmail = (EditText) findViewById(R.id.editTextEmail);
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
         buttonSignIn = (Button) findViewById(R.id.buttonSignin);
-        textViewSignup  = (TextView) findViewById(R.id.textViewSignUp);
+        textViewSignup  = (TextView) findViewById(R.id.textViewSignUp);*/
 
         progressDialog = new ProgressDialog(this);
 
         //attaching click listener
+/*
         buttonSignIn.setOnClickListener(this);
         textViewSignup.setOnClickListener(this);
+*/
 
     }
 

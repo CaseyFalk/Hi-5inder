@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Hi-5inder</string>
+    <string name="username">Default User</string>
+    <string name="userTagLine">Set this tag line (think like a bio)</string>
 </resources>

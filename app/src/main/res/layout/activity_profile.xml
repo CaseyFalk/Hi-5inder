@@ -20,27 +20,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.066"
-<<<<<<< HEAD
         app:srcCompat="@drawable/common_google_signin_btn_icon_dark" />
 
     <Button
         android:id="@+id/searchButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="164dp"
         android:layout_marginEnd="152dp"
         android:layout_marginStart="153dp"
-        android:layout_marginTop="24dp"
-        android:text="Search"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="11dp"
+        android:text="Start Searching"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.507"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView3" />
-=======
-        android:contentDescription="@string/todo" />
+        app:layout_constraintTop_toBottomOf="@+id/statusEdit" />
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/statusEdit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -54,20 +50,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView3" />
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="210dp"
-        android:layout_height="43dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/start_searching"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText" />
-
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/userTextView"
         android:layout_width="212dp"
         android:layout_height="39dp"
         android:layout_marginEnd="8dp"
@@ -80,17 +64,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView3" />
 
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="209dp"
-        android:layout_height="37dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/edit_profile"
+    <ImageButton
+        android:id="@+id/sendButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="134dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="54dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
+        app:layout_constraintStart_toEndOf="@+id/statusEdit"
+        app:layout_constraintTop_toBottomOf="@+id/imageView3"
+        app:srcCompat="?android:attr/actionModeCloseDrawable" />
 
->>>>>>> f798e1c2193178855bbf5a8f2d64a1e4cc74e0e9
+    <TextView
+        android:id="@+id/editProfileText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="118dp"
+        android:layout_marginStart="119dp"
+        android:text="Want to edit? Click here"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </android.support.constraint.ConstraintLayout>

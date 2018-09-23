@@ -134,17 +134,14 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
 
             if (checkPermission()) {
                 //main logic or main code
-
+                Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if(takePicture.resolveActivity(getPackageManager()) != null){
+                    startActivityForResult(takePicture, REQUEST_IMAGE_CAPTURE);
+                }
                 // . write your main code to execute, It will execute if the permission is already given.
 
             } else {
                 requestPermission();
-            }
-
-
-            Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if(takePicture.resolveActivity(getPackageManager()) != null){
-                startActivityForResult(takePicture, REQUEST_IMAGE_CAPTURE);
             }
         }
     }

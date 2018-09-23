@@ -16,6 +16,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoFire.CompletionListener;
+import com.google.firebase.FirebaseError;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -35,6 +38,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private ImageView profileImage;
     private TextView username;
     private TextView editProfile;
+    private Button logoutButton;
     private String url = "https://firebasestorage.googleapis.com/v0/b/hi-5inder.appspot.com/o/hand-1318340_960_720.png?alt=media&token=ab6dd714-28dd-4f50-a275-d6430860b761";
 
     //firebase auth object
@@ -54,6 +58,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         sendButton = (ImageButton) findViewById(R.id.sendButton);
         username = (TextView) findViewById(R.id.userTextView);
         editProfile = (TextView) findViewById(R.id.editProfileText);
+        logoutButton = (Button) findViewById(R.id.logOutbutton);
 
         //initializing firebase authentication object
         firebaseAuth = FirebaseAuth.getInstance();
@@ -112,6 +117,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         searchButton.setOnClickListener(this);
         sendButton.setOnClickListener(this);
         editProfile.setOnClickListener(this);
+        logoutButton.setOnClickListener(this);
 
     }
 
@@ -133,6 +139,21 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         else if (v == editProfile){
             finish();
             startActivity(new Intent(this, EditProfile.class));
+        }
+        else if (v == logoutButton){
+            FirebaseDatabase.getInstance().getReference().child("geoFireData").child(firebaseAuth.getUid()).removeValue();
+
+           /* GeoFire geoFire = new GeoFire(ref);
+            geoFire.removeLocation(firebaseAuth.getUid(), new CompletionListener() {
+                @Override
+                public void onComplete(String key, DatabaseError error) {
+
+                }
+        });*/
+            //ref.child(firebaseAuth.getUid()).removeValue();
+            firebaseAuth.signOut();
+            finish();
+            startActivity(new Intent( this, MainActivity.class ));
         }
     }
 

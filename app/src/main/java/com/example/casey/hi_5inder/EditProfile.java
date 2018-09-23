@@ -2,8 +2,10 @@ package com.example.casey.hi_5inder;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -13,6 +15,9 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -22,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 public class EditProfile extends AppCompatActivity implements View.OnClickListener{
 
@@ -32,6 +38,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
     static final int REQUEST_IMAGE_CAPTURE = 1;
     FirebaseStorage storage;
     StorageReference storageReference;
+    private Uri mImageUri = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +72,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                         // Get user information
                         User user = dataSnapshot.getValue(User.class);
 
-                        if (user.profilePic != null){
+                        /*if (user.profilePic != null){
                             String picURL = user.profilePic;
                             //Loading image from below url into imageView
                             Glide.with(EditProfile.this)
@@ -77,7 +84,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                             Glide.with(EditProfile.this)
                                     .load("https://firebasestorage.googleapis.com/v0/b/hi-5inder.appspot.com/o/hand-1318340_960_720.png?alt=media&token=ab6dd714-28dd-4f50-a275-d6430860b761")
                                     .into(profilePic);
-                        }
+                        }*/
 
                     }
 
@@ -100,6 +107,32 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference userStatus = database.getReference(firebaseAuth.getUid() + "/username");
             userStatus.setValue(editUsername.getText().toString());
+
+            storage = FirebaseStorage.getInstance();
+            storageReference = storage.getReference();
+            storageReference.putFile(mImageUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+                    return storageReference.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        FirebaseDatabase database = FirebaseDatabase.getInstance();
+                        DatabaseReference userStatus = database.getReference(firebaseAuth.getUid() + "/profilePic");
+                        userStatus.setValue(downloadUri.toString());
+                    } else {
+                        Toast.makeText(EditProfile.this, "photo upload failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+
             Toast.makeText(this, "Profile Updated", Toast.LENGTH_SHORT).show();
 
             finish();
@@ -119,8 +152,9 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
         if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK){
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
+            mImageUri = data.getData();
             profilePic.setImageBitmap(imageBitmap);
-            profilePic.setRotation(90);
+            profilePic.setRotation(-90);
 
 
 

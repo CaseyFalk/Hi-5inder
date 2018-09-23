@@ -1,8 +1,11 @@
 package com.example.casey.hi_5inder;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -68,31 +71,26 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         FirebaseUser user = firebaseAuth.getCurrentUser();
 
 
-        FirebaseDatabase.getInstance().getReference().child(user.getUid())
+        FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         // Get user information
-                       /* User user = dataSnapshot.getValue(User.class);
+                        User user = dataSnapshot.getValue(User.class);
                         if (user.username != null){
                             String userName = user.username;
                             username.setText(userName);
                         }
 
-                        if (user.status != null){
-                            String status = user.status;
-                            statusUpdate.setText(status);
-                        }
 
                         if (user.profilePic != null){
                             String picURL = user.profilePic;
                             //Loading image from below url into imageView
-                            url = picURL;
-                        }*/
+                            profileImage.setImageBitmap(base64ToBitmap(picURL));
+                            profileImage.setRotation(-90);
+                        }
 
-                        Glide.with(ProfileActivity.this)
-                                .load(url)
-                                .into(profileImage);
+
 
                     }
 
@@ -136,5 +134,10 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             finish();
             startActivity(new Intent(this, EditProfile.class));
         }
+    }
+
+    private Bitmap base64ToBitmap(String b64) {
+        byte[] imageAsBytes = Base64.decode(b64.getBytes(), Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
     }
 }

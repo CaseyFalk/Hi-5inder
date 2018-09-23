@@ -2,12 +2,15 @@ package com.example.casey.hi_5inder;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.provider.SyncStateContract;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,6 +32,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+
 public class EditProfile extends AppCompatActivity implements View.OnClickListener{
 
     private Button saveProfileButton;
@@ -36,9 +41,6 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
     private EditText editUsername;
     private FirebaseAuth firebaseAuth;
     static final int REQUEST_IMAGE_CAPTURE = 1;
-    FirebaseStorage storage;
-    StorageReference storageReference;
-    private Uri mImageUri = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,19 +74,17 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
                         // Get user information
                         User user = dataSnapshot.getValue(User.class);
 
-                        /*if (user.profilePic != null){
+                        if (user.profilePic != null){
                             String picURL = user.profilePic;
                             //Loading image from below url into imageView
-                            Glide.with(EditProfile.this)
-                                    .load(picURL)
-                                    .into(profilePic);
+                            profilePic.setImageBitmap(base64ToBitmap(picURL));
                         }
                         else{
                             //Loading image from below url into imageView
                             Glide.with(EditProfile.this)
                                     .load("https://firebasestorage.googleapis.com/v0/b/hi-5inder.appspot.com/o/hand-1318340_960_720.png?alt=media&token=ab6dd714-28dd-4f50-a275-d6430860b761")
                                     .into(profilePic);
-                        }*/
+                        }
 
                     }
 
@@ -105,7 +105,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
     public void onClick(View v) {
         if (v == saveProfileButton){
             FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference userStatus = database.getReference(firebaseAuth.getUid() + "/username");
+            DatabaseReference userStatus = database.getReference("/users/" + firebaseAuth.getUid() + "/username");
             userStatus.setValue(editUsername.getText().toString());
 
 
@@ -128,35 +128,24 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
         if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK){
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
-            mImageUri = data.getData();
             profilePic.setImageBitmap(imageBitmap);
             profilePic.setRotation(-90);
-            storage = FirebaseStorage.getInstance();
-            storageReference = storage.getReference();
-            storageReference.putFile(mImageUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                @Override
-                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                    if (!task.isSuccessful()) {
-                        throw task.getException();
-                    }
-                    return storageReference.getDownloadUrl();
-                }
-            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if (task.isSuccessful()) {
-                        Uri downloadUri = task.getResult();
-                        FirebaseDatabase database = FirebaseDatabase.getInstance();
-                        DatabaseReference userStatus = database.getReference(firebaseAuth.getUid() + "/profilePic");
-                        userStatus.setValue(downloadUri.toString());
-                    } else {
-                        Toast.makeText(EditProfile.this, "photo upload failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-
-
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference userStatus = database.getReference("/users/" + firebaseAuth.getUid() + "/profilePic");
+            userStatus.setValue(bitmapToBase64(imageBitmap));
 
         }
+    }
+
+    private String bitmapToBase64(Bitmap bitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream .toByteArray();
+        return Base64.encodeToString(byteArray, Base64.DEFAULT);
+    }
+
+    private Bitmap base64ToBitmap(String b64) {
+        byte[] imageAsBytes = Base64.decode(b64.getBytes(), Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
     }
 }

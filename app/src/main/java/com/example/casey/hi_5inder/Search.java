@@ -265,4 +265,10 @@ public class Search extends AppCompatActivity implements LocationListener {
         byte[] imageAsBytes = Base64.decode(b64.getBytes(), Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
     }
+
+    @Override
+    public void onBackPressed(){
+        finish();
+        startActivity(new Intent(this, ProfileActivity.class));
+    }
 }

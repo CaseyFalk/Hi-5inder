@@ -52,6 +52,7 @@ public class Search extends AppCompatActivity implements LocationListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         mContext = getApplicationContext();
+        linLayout = (LinearLayout) findViewById(R.id.mainLayout);
 
         //initializing firebase authentication object
         firebaseAuth = FirebaseAuth.getInstance();
@@ -66,7 +67,7 @@ public class Search extends AppCompatActivity implements LocationListener {
         }
 
         //getting current user
-        FirebaseUser user = firebaseAuth.getCurrentUser();
+        final FirebaseUser user = firebaseAuth.getCurrentUser();
 
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (!lm.isProviderEnabled(GPS_PROVIDER)) {
@@ -91,101 +92,6 @@ public class Search extends AppCompatActivity implements LocationListener {
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST);
         }
-        if (location != null){
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference ref = database.getReference(firebaseAuth.getUid().toString() + "/geoFireData");
-            GeoFire geoFire = new GeoFire(ref);
-            GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 0.6);
-
-            geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
-                @Override
-                public void onKeyEntered(String key, GeoLocation location) {
-                    System.out.println(String.format("Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
-
-
-                    FirebaseDatabase.getInstance().getReference()
-                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    CardView card = new CardView(mContext);
-                                    // Get user information
-                                    User user = dataSnapshot.getValue(User.class);
-                                    if (user.username != null){
-
-                                        String username;
-                                        username = user.username;
-
-
-                                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                                LinearLayout.LayoutParams.WRAP_CONTENT,
-                                                LinearLayout.LayoutParams.WRAP_CONTENT
-                                        );
-                                        card.setLayoutParams(params);
-
-                                        // Set CardView corner radius
-                                        card.setRadius(9);
-
-                                        // Set cardView content padding
-                                        card.setContentPadding(15, 15, 15, 15);
-
-                                        // Set a background color for CardView
-                                        card.setCardBackgroundColor(Color.rgb(245,245,245));
-
-                                        // Set the CardView maximum elevation
-                                        card.setMaxCardElevation(15);
-
-                                        // Set CardView elevation
-                                        card.setCardElevation(9);
-
-                                        // Initialize a new TextView to put in CardView
-                                        TextView tv = new TextView(mContext);
-                                        tv.setLayoutParams(params);
-                                        tv.setText(username);
-                                        tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30);
-                                        tv.setTextColor(Color.BLACK);
-
-                                        // Put the TextView in CardView
-                                        card.addView(tv);
-                                    }
-                                    linLayout.addView(card);
-
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            });
-
-                    // Set the CardView layoutParams
-
-
-                    // Finally, add the CardView in root layout
-
-
-                }
-
-                @Override
-                public void onKeyExited(String key) {
-                    System.out.println(String.format("Key %s is no longer in the search area", key));
-                }
-
-                @Override
-                public void onKeyMoved(String key, GeoLocation location) {
-                    System.out.println(String.format("Key %s moved within the search area to [%f,%f]", key, location.latitude, location.longitude));
-                }
-
-                @Override
-                public void onGeoQueryReady() {
-                    System.out.println("All initial data has been loaded and events have been fired!");
-                }
-
-                @Override
-                public void onGeoQueryError(DatabaseError error) {
-                    System.err.println("There was an error with this query: " + error);
-                }
-            });
-        }
 
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -207,7 +113,7 @@ public class Search extends AppCompatActivity implements LocationListener {
         double longitude = location.getLongitude();
         // Push your location to FireBase
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference(firebaseAuth.getUid().toString() + "/geoFireData");
+        DatabaseReference ref = database.getReference("/geoFireData");
         GeoFire geoFire = new GeoFire(ref);
         geoFire.setLocation(firebaseAuth.getUid(), new GeoLocation(latitude, longitude), new GeoFire.CompletionListener() {
             @Override
@@ -222,6 +128,54 @@ public class Search extends AppCompatActivity implements LocationListener {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
                 System.out.println(String.format("Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference user = database.getReference("/users/" + key);
+                user.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot snapshot) {
+                        User user = snapshot.getValue(User.class);
+                        final CardView card = new CardView(mContext);
+
+                        // Set the CardView layoutParams
+                        final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                        );
+                        params.setMargins(15, 15, 15, 15);
+                        card.setLayoutParams(params);
+
+                        // Set CardView corner radius
+                        card.setRadius(9);
+
+                        // Set cardView content padding
+                        card.setContentPadding(15, 15, 15, 15);
+
+                        // Set a background color for CardView
+                        card.setCardBackgroundColor(Color.parseColor("#FFC6D6C3"));
+
+                        // Set the CardView maximum elevation
+                        card.setMaxCardElevation(15);
+
+                        // Set CardView elevation
+                        card.setCardElevation(9);
+                        // Initialize a new TextView to put in CardView
+                        TextView tv = new TextView(mContext);
+                        tv.setLayoutParams(params);
+                        tv.setText(user.username);
+                        tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30);
+                        tv.setTextColor(Color.BLACK);
+
+                        // Put the TextView in CardView
+                        card.addView(tv);
+                        // Finally, add the CardView in root layout
+                        linLayout.addView(card);
+                        System.out.println(snapshot.getValue());  //prints "Do you have data? You'll love Firebase."
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+
             }
 
             @Override
@@ -244,6 +198,22 @@ public class Search extends AppCompatActivity implements LocationListener {
                 System.err.println("There was an error with this query: " + error);
             }
         });
+
+        FirebaseDatabase.getInstance().getReference().child("users")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            User user = snapshot.getValue(User.class);
+
+                        }
+
+
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
     }
 
     @Override

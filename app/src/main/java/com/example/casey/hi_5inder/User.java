@@ -6,7 +6,6 @@ import com.google.firebase.database.IgnoreExtraProperties;
 public class User {
 
     public String username;
-    public String email;
     public String profilePic;
     public String status;
 
@@ -14,11 +13,11 @@ public class User {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public User(String username, String email, String profilePic, String status) {
+    public User(String username, String profilePic, String status) {
         this.username = username;
-        this.email = email;
         this.profilePic = profilePic;
         this.status = status;
     }
+
 
 }

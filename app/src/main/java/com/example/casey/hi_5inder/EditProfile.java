@@ -1,7 +1,9 @@
 package com.example.casey.hi_5inder;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,6 +20,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 public class EditProfile extends AppCompatActivity implements View.OnClickListener{
 
@@ -25,6 +29,9 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
     private ImageView profilePic;
     private EditText editUsername;
     private FirebaseAuth firebaseAuth;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+    FirebaseStorage storage;
+    StorageReference storageReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +58,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
         FirebaseUser user = firebaseAuth.getCurrentUser();
 
 
-        FirebaseDatabase.getInstance().getReference().child(user.getUid())
+        FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -100,6 +107,22 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
 
         }
         else if (v == profilePic){
+            Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if(takePicture.resolveActivity(getPackageManager()) != null){
+                startActivityForResult(takePicture, REQUEST_IMAGE_CAPTURE);
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK){
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            profilePic.setImageBitmap(imageBitmap);
+            profilePic.setRotation(90);
+
+
 
         }
     }

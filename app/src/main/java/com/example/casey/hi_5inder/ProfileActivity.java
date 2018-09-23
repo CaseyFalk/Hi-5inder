@@ -73,7 +73,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         // Get user information
-                        User user = dataSnapshot.getValue(User.class);
+                       /* User user = dataSnapshot.getValue(User.class);
                         if (user.username != null){
                             String userName = user.username;
                             username.setText(userName);
@@ -88,7 +88,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                             String picURL = user.profilePic;
                             //Loading image from below url into imageView
                             url = picURL;
-                        }
+                        }*/
 
                         Glide.with(ProfileActivity.this)
                                 .load(url)
@@ -122,14 +122,14 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         else if(v == sendButton){
             FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference userStatus = database.getReference(firebaseAuth.getUid() + "/status");
+            DatabaseReference userStatus = database.getReference("/users/" +firebaseAuth.getUid() + "/status");
             userStatus.setValue(statusUpdate.getText().toString());
             Toast.makeText(this, "Status Updated", Toast.LENGTH_SHORT).show();
         }
 
         else if (v == profileImage){
             FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference pic = database.getReference(firebaseAuth.getUid() + "/profilePic");
+            DatabaseReference pic = database.getReference("/users/" + firebaseAuth.getUid() + "/profilePic");
             pic.setValue(url);
         }
         else if (v == editProfile){

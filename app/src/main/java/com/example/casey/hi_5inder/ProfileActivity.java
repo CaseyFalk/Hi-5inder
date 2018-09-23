@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
@@ -63,13 +64,40 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         FirebaseUser user = firebaseAuth.getCurrentUser();
 
 
+        FirebaseDatabase.getInstance().getReference().child(user.getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        // Get user information
+                        User user = dataSnapshot.getValue(User.class);
+                        if (user.username != null){
+                            String userName = user.username;
+                            username.setText(userName);
+                        }
 
-        //Loading image from below url into imageView
+                        if (user.status != null){
+                            String status = user.status;
+                            statusUpdate.setText(status);
+                        }
+
+                        if (user.profilePic != null){
+                            String picURL = user.profilePic;
+                            //Loading image from below url into imageView
+                            url = picURL;
+                        }
+
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+        //set image
         Glide.with(this)
                 .load(url)
                 .into(profileImage);
-
-        
 
         searchButton.setOnClickListener(this);
         sendButton.setOnClickListener(this);
@@ -89,6 +117,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference userStatus = database.getReference(firebaseAuth.getUid() + "/status");
             userStatus.setValue(statusUpdate.getText().toString());
+            Toast.makeText(this, "Status Updated", Toast.LENGTH_SHORT).show();
         }
 
         else if (v == profileImage){

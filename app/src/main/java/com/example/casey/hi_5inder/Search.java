@@ -3,6 +3,7 @@ package com.example.casey.hi_5inder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -12,19 +13,26 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import static android.location.LocationManager.GPS_PROVIDER;
 
@@ -36,13 +44,14 @@ public class Search extends AppCompatActivity implements LocationListener {
     private static final long MIN_TIME = 400;
     private static final float MIN_DISTANCE = 1000;
     private Location location;
+    private Context mContext;
+    LinearLayout linLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mContext = getApplicationContext();
 
         //initializing firebase authentication object
         firebaseAuth = FirebaseAuth.getInstance();
@@ -92,6 +101,68 @@ public class Search extends AppCompatActivity implements LocationListener {
                 @Override
                 public void onKeyEntered(String key, GeoLocation location) {
                     System.out.println(String.format("Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
+
+
+                    FirebaseDatabase.getInstance().getReference()
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    CardView card = new CardView(mContext);
+                                    // Get user information
+                                    User user = dataSnapshot.getValue(User.class);
+                                    if (user.username != null){
+
+                                        String username;
+                                        username = user.username;
+
+
+                                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                                LinearLayout.LayoutParams.WRAP_CONTENT
+                                        );
+                                        card.setLayoutParams(params);
+
+                                        // Set CardView corner radius
+                                        card.setRadius(9);
+
+                                        // Set cardView content padding
+                                        card.setContentPadding(15, 15, 15, 15);
+
+                                        // Set a background color for CardView
+                                        card.setCardBackgroundColor(Color.rgb(245,245,245));
+
+                                        // Set the CardView maximum elevation
+                                        card.setMaxCardElevation(15);
+
+                                        // Set CardView elevation
+                                        card.setCardElevation(9);
+
+                                        // Initialize a new TextView to put in CardView
+                                        TextView tv = new TextView(mContext);
+                                        tv.setLayoutParams(params);
+                                        tv.setText(username);
+                                        tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30);
+                                        tv.setTextColor(Color.BLACK);
+
+                                        // Put the TextView in CardView
+                                        card.addView(tv);
+                                    }
+                                    linLayout.addView(card);
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+                    // Set the CardView layoutParams
+
+
+                    // Finally, add the CardView in root layout
+
+
                 }
 
                 @Override

@@ -108,30 +108,6 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
             DatabaseReference userStatus = database.getReference(firebaseAuth.getUid() + "/username");
             userStatus.setValue(editUsername.getText().toString());
 
-            storage = FirebaseStorage.getInstance();
-            storageReference = storage.getReference();
-            storageReference.putFile(mImageUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                @Override
-                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                    if (!task.isSuccessful()) {
-                        throw task.getException();
-                    }
-                    return storageReference.getDownloadUrl();
-                }
-            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if (task.isSuccessful()) {
-                        Uri downloadUri = task.getResult();
-                        FirebaseDatabase database = FirebaseDatabase.getInstance();
-                        DatabaseReference userStatus = database.getReference(firebaseAuth.getUid() + "/profilePic");
-                        userStatus.setValue(downloadUri.toString());
-                    } else {
-                        Toast.makeText(EditProfile.this, "photo upload failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-
 
             Toast.makeText(this, "Profile Updated", Toast.LENGTH_SHORT).show();
 
@@ -155,6 +131,29 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
             mImageUri = data.getData();
             profilePic.setImageBitmap(imageBitmap);
             profilePic.setRotation(-90);
+            storage = FirebaseStorage.getInstance();
+            storageReference = storage.getReference();
+            storageReference.putFile(mImageUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+                    return storageReference.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        FirebaseDatabase database = FirebaseDatabase.getInstance();
+                        DatabaseReference userStatus = database.getReference(firebaseAuth.getUid() + "/profilePic");
+                        userStatus.setValue(downloadUri.toString());
+                    } else {
+                        Toast.makeText(EditProfile.this, "photo upload failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
 
 
 

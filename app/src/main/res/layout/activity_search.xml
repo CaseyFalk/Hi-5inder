@@ -15,7 +15,14 @@
             android:id="@+id/mainLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:id="@+id/linLayout2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"></LinearLayout>
+        </LinearLayout>
     </ScrollView>
 
 </android.support.constraint.ConstraintLayout>

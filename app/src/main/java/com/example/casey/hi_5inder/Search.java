@@ -3,6 +3,8 @@ package com.example.casey.hi_5inder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -15,8 +17,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,11 +47,12 @@ public class Search extends AppCompatActivity implements LocationListener {
     private static final int PERMISSIONS_REQUEST = 100;
     private FirebaseAuth firebaseAuth;
     private LocationManager locationManager;
-    private static final long MIN_TIME = 400;
+    private static final long MIN_TIME = 100;
     private static final float MIN_DISTANCE = 1000;
     private Location location;
     private Context mContext;
     LinearLayout linLayout;
+    LinearLayout linLayoutInCard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +60,7 @@ public class Search extends AppCompatActivity implements LocationListener {
         setContentView(R.layout.activity_search);
         mContext = getApplicationContext();
         linLayout = (LinearLayout) findViewById(R.id.mainLayout);
+        linLayoutInCard = (LinearLayout) findViewById(R.id.linLayout2);
 
         //initializing firebase authentication object
         firebaseAuth = FirebaseAuth.getInstance();
@@ -142,6 +150,12 @@ public class Search extends AppCompatActivity implements LocationListener {
                                 LinearLayout.LayoutParams.WRAP_CONTENT
                         );
                         params.setMargins(15, 15, 15, 15);
+
+                        final FrameLayout.LayoutParams paramsInCard = new FrameLayout.LayoutParams(
+                                FrameLayout.LayoutParams.MATCH_PARENT,
+                                FrameLayout.LayoutParams.WRAP_CONTENT
+                        );
+                        paramsInCard.setMargins(20,20,20,20);
                         card.setLayoutParams(params);
 
                         // Set CardView corner radius
@@ -159,15 +173,48 @@ public class Search extends AppCompatActivity implements LocationListener {
                         // Set CardView elevation
                         card.setCardElevation(9);
                         // Initialize a new TextView to put in CardView
+                        linLayoutInCard = new LinearLayout(mContext);
+                        linLayoutInCard.setLayoutParams(paramsInCard);
+                        linLayoutInCard.setOrientation(LinearLayout.VERTICAL);
+                        linLayoutInCard.setWeightSum(3);
+
+                        ImageView prof = new ImageView(mContext);
+                        prof.setImageBitmap(base64ToBitmap(user.profilePic));
+                        prof.setMinimumWidth(500);
+                        prof.setMinimumHeight(800);
+                        prof.setRotation(-90);
+                        prof.setForegroundGravity(Gravity.CENTER);
+                        prof.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+
+                        linLayoutInCard.addView(prof);
+
+
                         TextView tv = new TextView(mContext);
                         tv.setLayoutParams(params);
                         tv.setText(user.username);
                         tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30);
                         tv.setTextColor(Color.BLACK);
+                        tv.setGravity(Gravity.CENTER);
+                        tv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
 
                         // Put the TextView in CardView
-                        card.addView(tv);
+                        linLayoutInCard.addView(tv);
+
+                        TextView status = new TextView(mContext);
+                        status.setLayoutParams(params);
+                        status.setText(user.status);
+                        status.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+                        status.setTextColor(Color.BLACK);
+                        status.setGravity(Gravity.CENTER);
+                        status.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+
+                        // Put the TextView in CardView
+                        linLayoutInCard.addView(status);
                         // Finally, add the CardView in root layout
+                        card.addView(linLayoutInCard);
                         linLayout.addView(card);
                         System.out.println(snapshot.getValue());  //prints "Do you have data? You'll love Firebase."
                     }
@@ -198,22 +245,6 @@ public class Search extends AppCompatActivity implements LocationListener {
                 System.err.println("There was an error with this query: " + error);
             }
         });
-
-        FirebaseDatabase.getInstance().getReference().child("users")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            User user = snapshot.getValue(User.class);
-
-                        }
-
-
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
     }
 
     @Override
@@ -229,5 +260,9 @@ public class Search extends AppCompatActivity implements LocationListener {
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+    private Bitmap base64ToBitmap(String b64) {
+        byte[] imageAsBytes = Base64.decode(b64.getBytes(), Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
     }
 }

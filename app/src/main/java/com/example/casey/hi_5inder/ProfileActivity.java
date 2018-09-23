@@ -89,6 +89,12 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                             profileImage.setImageBitmap(base64ToBitmap(picURL));
                             profileImage.setRotation(-90);
                         }
+                        else{
+
+                            Glide.with(ProfileActivity.this)
+                                    .load("https://firebasestorage.googleapis.com/v0/b/hi-5inder.appspot.com/o/hand-1318340_960_720.png?alt=media&token=ab6dd714-28dd-4f50-a275-d6430860b761")
+                                    .into(profileImage);
+                        }
 
 
 
@@ -105,7 +111,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         searchButton.setOnClickListener(this);
         sendButton.setOnClickListener(this);
-        profileImage.setOnClickListener(this);
         editProfile.setOnClickListener(this);
 
     }
@@ -125,11 +130,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             Toast.makeText(this, "Status Updated", Toast.LENGTH_SHORT).show();
         }
 
-        else if (v == profileImage){
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference pic = database.getReference("/users/" + firebaseAuth.getUid() + "/profilePic");
-            pic.setValue(url);
-        }
         else if (v == editProfile){
             finish();
             startActivity(new Intent(this, EditProfile.class));

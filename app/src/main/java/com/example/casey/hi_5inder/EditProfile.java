@@ -221,7 +221,7 @@ public class EditProfile extends AppCompatActivity implements View.OnClickListen
     }
 
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(MainActivity.this)
+        new AlertDialog.Builder(EditProfile.this)
                 .setMessage(message)
                 .setPositiveButton("OK", okListener)
                 .setNegativeButton("Cancel", null)

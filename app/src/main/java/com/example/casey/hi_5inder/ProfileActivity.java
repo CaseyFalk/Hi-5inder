@@ -22,6 +22,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import org.w3c.dom.Text;
+
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener{
 
     private Button searchButton;
@@ -29,7 +31,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private ImageButton sendButton;
     private ImageView profileImage;
     private TextView username;
-    String url = "https://firebasestorage.googleapis.com/v0/b/hi-5inder.appspot.com/o/hand-1318340_960_720.png?alt=media&token=ab6dd714-28dd-4f50-a275-d6430860b761";
+    private TextView editProfile;
+    private String url = "https://firebasestorage.googleapis.com/v0/b/hi-5inder.appspot.com/o/hand-1318340_960_720.png?alt=media&token=ab6dd714-28dd-4f50-a275-d6430860b761";
 
     //firebase auth object
     private FirebaseAuth firebaseAuth;
@@ -47,6 +50,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         statusUpdate = (EditText) findViewById(R.id.statusEdit);
         sendButton = (ImageButton) findViewById(R.id.sendButton);
         username = (TextView) findViewById(R.id.userTextView);
+        editProfile = (TextView) findViewById(R.id.editProfileText);
 
         //initializing firebase authentication object
         firebaseAuth = FirebaseAuth.getInstance();
@@ -86,6 +90,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                             url = picURL;
                         }
 
+                        Glide.with(ProfileActivity.this)
+                                .load(url)
+                                .into(profileImage);
 
                     }
 
@@ -94,14 +101,14 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
                     }
                 });
+
         //set image
-        Glide.with(this)
-                .load(url)
-                .into(profileImage);
+
 
         searchButton.setOnClickListener(this);
         sendButton.setOnClickListener(this);
         profileImage.setOnClickListener(this);
+        editProfile.setOnClickListener(this);
 
     }
 
@@ -124,6 +131,10 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference pic = database.getReference(firebaseAuth.getUid() + "/profilePic");
             pic.setValue(url);
+        }
+        else if (v == editProfile){
+            finish();
+            startActivity(new Intent(this, EditProfile.class));
         }
     }
 }

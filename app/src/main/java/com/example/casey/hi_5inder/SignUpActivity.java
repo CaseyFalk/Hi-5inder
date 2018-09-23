@@ -21,6 +21,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -102,6 +104,12 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         //checking if success
                         if(task.isSuccessful()){
+                            FirebaseDatabase database = FirebaseDatabase.getInstance();
+                            DatabaseReference userStatus = database.getReference("/users/" +firebaseAuth.getUid() + "/status");
+                            userStatus.setValue("Make a new status!");
+                            DatabaseReference userName = database.getReference("/users/" +firebaseAuth.getUid() + "/username");
+                            userName.setValue("New User");
+
                             finish();
                             startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
                         }else{
